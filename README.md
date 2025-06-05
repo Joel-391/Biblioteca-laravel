@@ -21,7 +21,7 @@ Sigue estos pasos para ejecutar el proyecto localmente:
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/usuario/nombre-del-repositorio.git
+git clone https://github.com/Joel-391/Biblioteca-laravel.git
 ```
 
 ### 2. Acceder a la carpeta del proyecto
