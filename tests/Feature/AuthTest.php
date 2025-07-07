@@ -49,7 +49,6 @@ class AuthTest extends TestCase
         // Hacer una solicitud GET a la ruta protegida sin ningún token
         $response = $this->get('/api/user');  // Ruta protegida
 
-        // Verificar que la respuesta sea un error de no autorizado (401)
         // Aquí estamos asegurándonos de que no se pueda acceder sin token
         $response->assertRedirect('/login');  
     }
@@ -64,7 +63,7 @@ class AuthTest extends TestCase
             'Authorization' => 'Bearer ' . $invalidToken,  // Usar un token inválido
         ])->get('/api/user');
 
-        // Verificar que la respuesta sea un error de no autorizado (401)
+
         $response->assertRedirect('/login'); 
     }
 }

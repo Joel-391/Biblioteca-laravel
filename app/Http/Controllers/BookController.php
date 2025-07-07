@@ -2,31 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Libro;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+//1. Se importa el servicio que contiene la lógica del negocio
+use App\Services\BookService;
+use Illuminate\Http\JsonResponse;
 
 class BookController extends Controller
 {
-    public function getRecentBooks()
+    //Inyección del servicio en el constructor
+    protected $bookService;
+
+    public function __construct(BookService $bookService)
     {
-        // Obtener los 3 libros más recientes
-        $books = Libro::latest()  // Ordena por fecha de creación descendente
-                        ->take(3)  // Limita la cantidad a 3 libros
-                        ->get();
-
-        return response()->json($books);
-    }
-    
-    public function getRecommendedBooks()
-    {
-    // Definir los libros recomendados directamente en el backend (puedes poner los IDs específicos que quieras)
-      $recommendedIds = [10, 13, 14, 5, 4, 3];  // Aquí defines los libros recomendados manualmente
-
-    // Obtener los libros recomendados de la base de datos
-      $books = Libro::whereIn('id', $recommendedIds)->get();
-
-      return response()->json($books);
+        //2. Laravel inyecta automáticamente la instancia del BookService
+        $this->bookService = $bookService;
     }
 
+    /**
+     * Obtener los libros más recientes
+     * - El controlador NO accede directamente al modelo Libro
+     * - Llama al servicio, que se encarga de delegar al repositorio
+     */
+    public function getRecentBooks(): JsonResponse
+    {
+        $books = $this->bookService->getRecentBooks(); //Lógica en el servicio → repositorio
+        return response()->json($books); //Respuesta JSON con los datos obtenidos
+    }
+
+    /**
+     * Obtener libros recomendados
+     * - IDs recomendados definidos dentro del servicio
+     * - El controlador no sabe de la lógica de selección
+     */
+    public function getRecommendedBooks(): JsonResponse
+    {
+        $books = $this->bookService->getRecommendedBooks(); //Llama al servicio → al repositorio
+        return response()->json($books); //Retorna los libros seleccionados
+    }
 }

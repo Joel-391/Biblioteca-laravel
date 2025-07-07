@@ -2,55 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+// 1. Se importa el Form Request que valida la entrada (capa de validación)
+use App\Http\Requests\UpdateProfileRequest;
+
+// 2. Se importa el Servicio que contiene la lógica de negocio
+use App\Services\UserService;
+
+use Illuminate\Http\JsonResponse;
 
 class ProfileController extends Controller
 {
-    public function getProfile(Request $request)
-    {
-        // Obtén el usuario autenticado
-        $user = Auth::user();
+    // Inyección del servicio (se usa la capa de servicio aquí)
+    protected $userService;
 
-        // Devolver solo los datos necesarios
-        return response()->json([
-            'name' => $user->name,
-            'telefono' => $user->telefono,
-            'direccion' => $user->direccion,
-        ]);
+    public function __construct(UserService $userService)
+    {
+        // 3. Laravel resuelve automáticamente la instancia del servicio
+        $this->userService = $userService;
     }
 
-    // Método para actualizar el perfil del usuario
+    /**
+     * Método que obtiene datos del perfil del usuario
+     * - No accede al modelo directamente
+     * - Llama al método del servicio
+     * - El servicio luego llama al repositorio
+     */
+    public function getProfile(): JsonResponse
+    {
+        $data = $this->userService->getProfileData(); // Lógica delegada al Service
+        return response()->json($data); // Devuelve los datos como respuesta JSON
+    }
 
-// Método para actualizar el perfil del usuario
-public function update(Request $request)
-{
-    // Validación de los datos enviados
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'telefono' => 'nullable|string|max:10',
-        'direccion' => 'nullable|string',
-    ]);
+    /**
+     * Método para actualizar el perfil del usuario
+     * - Recibe datos validados automáticamente por el Form Request
+     * - Llama al servicio para procesar la actualización
+     */
+    public function update(UpdateProfileRequest $request): JsonResponse
+    {
+        // El método validated() devuelve solo los datos validados
+        $updatedUser = $this->userService->updateProfile($request->validated()); // lógica delegada
 
-    // Obtener el usuario autenticado
-    $user = Auth::user();
-
-    // Verificar que estamos obteniendo el usuario correcto
-    \Log::info('Usuario actual antes de actualización:', $user->toArray());
-
-    // Actualizar los datos
-    $user->name = $request->name;
-    $user->telefono = $request->telefono;
-    $user->direccion = $request->direccion;
-    $user->save();
-
-    // Verificar si se guardó correctamente
-    \Log::info('Usuario después de actualización:', $user->toArray());
-
-    // Responder con éxito
-    return response()->json($user);
-}
-
-
-
+        return response()->json($updatedUser); // Devuelve el usuario actualizado
+    }
 }
