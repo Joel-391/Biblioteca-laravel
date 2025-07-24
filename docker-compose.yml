@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:16
+    ports:
+    - "5432:5432" 
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: biblioteca
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./Biblioteca-laravel
+    container_name: laravel_app
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./Biblioteca-laravel:/var/www
+    working_dir: /var/www
+    command: sh -c "php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000"
+
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./Biblioteca-react
+    container_name: react_app
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./Biblioteca-react:/app
+    working_dir: /app
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge
