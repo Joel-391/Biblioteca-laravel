@@ -10,7 +10,7 @@ class Ejemplar extends Model
     use HasFactory;
 
     protected $table = 'ejemplares';
-    protected $fillable = ['libro_id', 'ubicacion_fisica', 'disponible'];
+    protected $fillable = ['libro_id', 'ubicacion_fisica', 'disponible', 'nota'];
 
     public function libro()
     {

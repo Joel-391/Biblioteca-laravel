@@ -2,19 +2,7 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cross-Origin Resource Sharing (CORS) Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Aquí puedes configurar las opciones CORS para que tu frontend React
-    | (que corre en Docker en http://localhost:3000) se comunique sin errores
-    | con el backend Laravel en http://localhost:8000.
-    |
-    */
-
-    // Solo aplica CORS a rutas API y auth
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'login', 'logout', '/','register' ],
 
     'allowed_methods' => ['*'],
 
@@ -28,5 +16,7 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => true, // Necesario si usas cookies de sesión (Sanctum)
+    'supports_credentials' => true,
+
 ];
+
