@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('libro_id')->constrained('libros')->onDelete('cascade');
             $table->text('contenido');
-            $table->integer('calificacion')->nullable();
+            $table->unsignedTinyInteger('calificacion'); 
             $table->timestamps();
         });
     }

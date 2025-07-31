@@ -73,6 +73,8 @@ Route::middleware('auth:sanctum')->put('/profile', [ProfileController::class, 'u
 
 Route::get('/recent-books', [BookController::class, 'getRecentBooks']);
 Route::get('/recommended-books', [BookController::class, 'getRecommendedBooks']);
+Route::get('/libros/buscar', [BookController::class, 'buscarLibros']);
+Route::get('/libros/{id}', [BookController::class, 'show']);
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();

@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-
+use App\Http\Controllers\BookController;
+use App\Http\Controllers\ComentarioController;
 //Route::middleware('auth:sanctum')->get('/profile', [ProfileController::class, 'getProfile']);
 //Route::middleware('auth:sanctum')->put('/profile', [ProfileController::class, 'updateProfile']);
 
@@ -14,3 +15,12 @@ Route::get('/', function () {
 });
 
 require __DIR__.'/auth.php';
+Route::get('/libros/buscar', [BookController::class, 'buscarLibros']);
+Route::get('/libros/{id}', [BookController::class, 'show']);
+
+Route::get('/libros/{id}/comentarios', [ComentarioController::class, 'index']);
+Route::post('/libros/{id}/comentarios', [ComentarioController::class, 'store'])->middleware('auth:sanctum');
+
+Route::middleware('auth:sanctum')->get('/user', function (\Illuminate\Http\Request $request) {
+    return $request->user();
+});

@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\BookRepository;
-
+use App\Models\Libro;
 class BookService
 {
     protected $bookRepository;
@@ -31,5 +31,21 @@ class BookService
         $recommendedIds = [10, 13, 14, 5, 4, 3]; //Definidos aquí, no en el controlador
 
         return $this->bookRepository->getBooksByIds($recommendedIds);
+    }
+    public function buscarLibros($titulo, $categoria)
+    {
+        $query = Libro::with('categoria');
+
+        if ($titulo) {
+            $query->where('titulo', 'ILIKE', "%$titulo%");
+        }
+
+        if ($categoria) {
+            $query->whereHas('categoria', function ($q) use ($categoria) {
+                $q->where('nombre_cat', 'ILIKE', "%$categoria%");
+            });
+        }
+
+        return $query->get();
     }
 }

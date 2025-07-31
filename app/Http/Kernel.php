@@ -43,7 +43,7 @@ class Kernel extends HttpKernel
     ];
     protected $middlewareGroups = [
     'api' => [
-        EnsureFrontendRequestsAreStateful::class, // <- Asegúrate que esté
+        \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,  
         'throttle:api',
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
     ],

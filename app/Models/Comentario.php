@@ -11,7 +11,7 @@ class Comentario extends Model
 
     protected $fillable = ['user_id', 'libro_id', 'contenido', 'calificacion'];
 
-    public function usuario()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
@@ -20,4 +20,5 @@ class Comentario extends Model
     {
         return $this->belongsTo(Libro::class);
     }
+    
 }
