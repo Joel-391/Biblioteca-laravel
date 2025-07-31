@@ -6,6 +6,16 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EjemplarController;
+use App\Http\Controllers\AlquilerController;
+
+Route::get('/libros/{libro}/ejemplares-disponibles', [EjemplarController::class, 'disponibles']);
+Route::middleware('auth:sanctum')->get('/alquileres', [AlquilerController::class, 'index']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/alquileres', [AlquilerController::class, 'store']);
+});
+
 
 // O si quieres puedes crear rutas separadas para usuarios, libros y categorías
 

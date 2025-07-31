@@ -9,15 +9,16 @@ class Alquiler extends Model
 {
     use HasFactory;
     protected $table = 'alquileres';
-    protected $fillable = ['user_id', 'libro_id', 'fecha_alquiler', 'fecha_devolucion', 'devuelto'];
+    protected $fillable = ['user_id', 'ejemplar_id', 'fecha_alquiler', 'fecha_devolucion', 'devuelto', 'estado'];
 
     public function usuario()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function libro()
-    {
-        return $this->belongsTo(Libro::class);
-    }
+    public function ejemplar()
+{
+    return $this->belongsTo(Ejemplar::class);
+}
+
 }

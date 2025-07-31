@@ -116,21 +116,29 @@ class AdminController extends Controller
     }
 
     // Actualizar usuario
-    public function updateUser(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-        $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $id,
-            'telefono' => 'sometimes|string|max:20',
-            'direccion' => 'sometimes|string|max:255',
-            'activo' => 'sometimes|boolean',
-            'rol_id' => 'sometimes|integer|exists:roles,id',
-            // agregar más campos según tu modelo
-        ]);
-        $user->update($data);
-        return response()->json($user);
+public function updateUser(Request $request, $id)
+{
+    \Log::info('Datos recibidos para updateUser:', $request->all());
+    $user = User::findOrFail($id);
+
+    $data = $request->validate([
+        'name' => 'sometimes|string|max:255',
+        'email' => 'sometimes|email|unique:users,email,' . $id,
+        'telefono' => 'sometimes|string|max:20',
+        'direccion' => 'sometimes|string|max:255',
+        'activo' => 'sometimes|boolean', // solo validamos que venga, lo convertimos abajo
+        'rol_id' => 'sometimes|integer|exists:roles,id',
+    ]);
+
+    // 🛠 Convertimos "true"/"false" a booleano real
+    if ($request->has('activo')) {
+        $data['activo'] = filter_var($request->activo, FILTER_VALIDATE_BOOLEAN);
     }
+
+    $user->update($data);
+    \Log::info('Usuario actualizado:', $user->toArray());
+    return response()->json($user);
+}
 
     // Eliminar usuario
     public function deleteUser($id)
@@ -185,20 +193,26 @@ class AdminController extends Controller
         return response()->json(['message' => 'Categoría eliminada']);
     }
 
-    // Actualizar alquiler
     public function updateAlquiler(Request $request, $id)
-    {
-        $alquiler = Alquiler::findOrFail($id);
-        $data = $request->validate([
-            'user_id' => 'sometimes|integer|exists:users,id',
-            'libro_id' => 'sometimes|integer|exists:libros,id',
-            'fecha_alquiler' => 'sometimes|date',
-            'fecha_devolucion' => 'sometimes|date|nullable',
-            'devuelto' => 'sometimes|boolean',
-        ]);
-        $alquiler->update($data);
-        return response()->json($alquiler);
+{
+    $alquiler = Alquiler::findOrFail($id);
+    $data = $request->validate([
+        'user_id' => 'sometimes|integer|exists:users,id',
+        'ejemplar_id' => 'sometimes|integer|exists:ejemplares,id',
+        'fecha_alquiler' => 'sometimes|date',
+        'fecha_devolucion' => 'sometimes|date|nullable',
+        'devuelto' => 'sometimes|boolean',
+    ]);
+
+    // Convierte el valor recibido a booleano real
+    if ($request->has('devuelto')) {
+        $data['devuelto'] = filter_var($request->devuelto, FILTER_VALIDATE_BOOLEAN);
     }
+
+    $alquiler->update($data);
+    return response()->json($alquiler);
+}
+
 
     // Eliminar alquiler
     public function deleteAlquiler($id)
@@ -231,17 +245,28 @@ class AdminController extends Controller
     }
 
     // Actualizar ejemplar
-    public function updateEjemplar(Request $request, $id)
-    {
-        $ejemplar = Ejemplar::findOrFail($id);
-        $data = $request->validate([
-            'libro_id' => 'sometimes|integer|exists:libros,id',
-            'ubicacion_fisica' => 'sometimes|string|max:255',
-            'disponible' => 'sometimes|boolean',
-        ]);
-        $ejemplar->update($data);
-        return response()->json($ejemplar);
+public function updateEjemplar(Request $request, $id)
+{
+    \Log::info('Request data:', $request->all());
+
+    $ejemplar = Ejemplar::findOrFail($id);
+
+    $data = $request->validate([
+        'libro_id' => 'sometimes|integer|exists:libros,id',
+        'ubicacion_fisica' => 'sometimes|string|max:255',
+        // Ojo: No validar 'disponible' con boolean acá para poder hacer conversión manual
+    ]);
+
+    if ($request->has('disponible')) {
+        // Convierte 'true'/'false' string a boolean real
+        $data['disponible'] = filter_var($request->input('disponible'), FILTER_VALIDATE_BOOLEAN);
     }
+
+    $ejemplar->update($data);
+
+    return response()->json($ejemplar);
+}
+
 
     // Eliminar ejemplar
     public function deleteEjemplar($id)
