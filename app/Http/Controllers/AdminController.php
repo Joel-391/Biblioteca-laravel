@@ -193,25 +193,52 @@ public function updateUser(Request $request, $id)
         return response()->json(['message' => 'Categoría eliminada']);
     }
 
-    public function updateAlquiler(Request $request, $id)
+
+
+
+public function updateAlquiler(Request $request, $id)
 {
+    \Log::info("Request data en updateAlquiler:", $request->all());
+
     $alquiler = Alquiler::findOrFail($id);
+
+    // validamos solo tipo y existencia, sin 'in'
     $data = $request->validate([
-        'user_id' => 'sometimes|integer|exists:users,id',
-        'ejemplar_id' => 'sometimes|integer|exists:ejemplares,id',
-        'fecha_alquiler' => 'sometimes|date',
+        'user_id'          => 'sometimes|integer|exists:users,id',
+        'ejemplar_id'      => 'sometimes|integer|exists:ejemplares,id',
+        'fecha_alquiler'   => 'sometimes|date',
         'fecha_devolucion' => 'sometimes|date|nullable',
-        'devuelto' => 'sometimes|boolean',
+        'devuelto'         => 'sometimes',
+        'estado'           => 'sometimes|string',
     ]);
 
-    // Convierte el valor recibido a booleano real
     if ($request->has('devuelto')) {
-        $data['devuelto'] = filter_var($request->devuelto, FILTER_VALIDATE_BOOLEAN);
+        $data['devuelto'] = filter_var($request->input('devuelto'), FILTER_VALIDATE_BOOLEAN);
     }
 
+    if ($request->has('estado')) {
+        $raw = $request->input('estado');
+        $normalized = ucfirst(strtolower($raw));
+        // comprobamos manualmente:
+        if (!in_array($normalized, ['Pendiente','Aceptado','Denegado'])) {
+            return response()->json(['error'=>'Estado inválido'], 422);
+        }
+        $data['estado'] = $normalized;
+        \Log::info("Estado normalizado para guardar: {$data['estado']}");
+    }
+
+    \Log::info("Data final a updateAlquiler:", $data);
+
     $alquiler->update($data);
+
     return response()->json($alquiler);
 }
+
+
+
+
+
+
 
 
     // Eliminar alquiler
