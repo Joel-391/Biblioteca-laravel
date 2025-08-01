@@ -11,6 +11,7 @@ use App\Models\Alquiler;
 use App\Models\Comentario;
 use App\Models\Ejemplar;
 use App\Models\Sancion;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -108,9 +109,12 @@ class AdminController extends Controller
             'motivo'        => 'required|string',
             'fecha_inicio'  => 'required|date',
             'fecha_fin'     => 'nullable|date',
-            'estado'        => 'required|string',
+            'estado'        => 'required', 
             'monto_sancion' => 'required|numeric',
         ]);
+         // Convierte string "true"/"false" a boolean real
+        $data['estado'] = filter_var($data['estado'], FILTER_VALIDATE_BOOLEAN);
+
         $san = Sancion::create($data);
         return response()->json($san, 201);
     }
@@ -299,4 +303,23 @@ public function updateEjemplar(Request $request, $id)
         $sancion->delete();
         return response()->json(['message' => 'Sanción eliminada']);
     }
+    // Obtener sanciones del usuario autenticado
+    public function misSanciones(Request $request)
+    {
+        $user = $request->user();
+
+        $sanciones = Sancion::where('user_id', $user->id)->get();
+
+        return response()->json($sanciones);
+    }
+    // Verifica si el usuario tiene sanción activa
+    public function tieneSancionActiva($userId)
+    {
+        return Sancion::where('user_id', $userId)
+                    ->where('estado', true)  // estado booleano, true = activa
+                    ->whereDate('fecha_inicio', '<=', now())
+                    ->whereDate('fecha_fin', '>=', now())
+                    ->exists();
+    }
+    
 }

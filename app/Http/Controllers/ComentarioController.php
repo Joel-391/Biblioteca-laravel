@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Comentario;
-
+use App\Models\Sancion;
 class ComentarioController extends Controller
 {
     // Obtener comentarios de un libro
@@ -23,23 +23,27 @@ class ComentarioController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || !$user->activo) {
-            return response()->json([
-                'message' => 'Tu cuenta ha sido desactivada. No puedes comentar.'
-            ], 403);
+        // Verificar sanción activa
+        $sancionActiva = Sancion::where('user_id', $user->id)
+            ->where('estado', true)
+            ->whereDate('fecha_inicio', '<=', now())
+            ->whereDate('fecha_fin', '>=', now())
+            ->exists();
+
+        if ($sancionActiva) {
+            return response()->json(['error' => 'No puede comentar porque tiene una sanción activa.'], 403);
         }
 
-        $validated = $request->validate([
+        // Continuar validación y creación del comentario...
+        $data = $request->validate([
             'contenido' => 'required|string',
-            'calificacion' => 'required|integer|min:0|max:5',
+            'calificacion' => 'required|integer|min:1|max:5',
         ]);
 
-        $comentario = Comentario::create([
-            'user_id' => $user->id,
-            'libro_id' => $libroId,
-            'contenido' => $validated['contenido'],
-            'calificacion' => $validated['calificacion'],
-        ]);
+        $data['user_id'] = $user->id;
+        $data['libro_id'] = $libroId;
+
+        $comentario = Comentario::create($data);
 
         return response()->json($comentario, 201);
     }

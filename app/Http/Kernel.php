@@ -47,5 +47,24 @@ class Kernel extends HttpKernel
         'throttle:api',
         \Illuminate\Routing\Middleware\SubstituteBindings::class,
     ],
+    
 ];
+/**
+     * Definir la programación de comandos.
+     */
+    protected function schedule(Schedule $schedule)
+    {
+        // Ejecutar todos los días a la medianoche (o puedes cambiar la hora)
+        $schedule->command('usuarios:reactivar')->daily();
+    }
+
+    /**
+     * Registrar las rutas de comandos para Artisan.
+     */
+    protected function commands()
+    {
+        $this->load(__DIR__.'/Commands');
+
+        require base_path('routes/console.php');
+    }
 }

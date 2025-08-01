@@ -54,4 +54,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Alquiler::class, 'user_id');
     }
+    public function sanciones()
+    {
+        return $this->hasMany(\App\Models\Sancion::class, 'user_id');
+    }
 }

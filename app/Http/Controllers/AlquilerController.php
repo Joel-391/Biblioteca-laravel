@@ -5,38 +5,34 @@ namespace App\Http\Controllers;
 use App\Models\Alquiler;
 use App\Models\Ejemplar;
 use Illuminate\Http\Request;
+use App\Models\Sancion;
 
 class AlquilerController extends Controller
 {
     public function store(Request $request)
-{
-    $request->validate([
-        'ejemplar_id' => 'required|exists:ejemplares,id',
-    ]);
+    {
+        $user = $request->user();
 
-    $user = $request->user(); // Usuario autenticado
+        $sancionActiva = Sancion::where('user_id', $user->id)
+            ->where('estado', true)
+            ->whereDate('fecha_inicio', '<=', now())
+            ->whereDate('fecha_fin', '>=', now())
+            ->exists();
 
-    if (!$user) {
-        return response()->json(['error' => 'No autenticado'], 401);
+        if ($sancionActiva) {
+            return response()->json(['error' => 'No puede alquilar libros porque tiene una sanción activa.'], 403);
+        }
+
+        $data = $request->validate([
+            'libro_id' => 'required|integer|exists:libros,id',
+            // otros campos si es necesario
+        ]);
+
+        $data['user_id'] = $user->id;
+        $alquiler = Alquiler::create($data);
+
+        return response()->json($alquiler, 201);
     }
-
-    $ejemplar = Ejemplar::findOrFail($request->ejemplar_id);
-
-    if (!$ejemplar->disponible) {
-        return response()->json(['error' => 'Ejemplar no disponible'], 422);
-    }
-
-    $alquiler = Alquiler::create([
-        'user_id' => $user->id,
-        'ejemplar_id' => $request->ejemplar_id,
-        'estado' => 'Pendiente',
-    ]);
-
-    $ejemplar->disponible = false;
-    $ejemplar->save();
-
-    return response()->json(['message' => 'Alquiler registrado con éxito', 'alquiler' => $alquiler]);
-}
 
 
 
