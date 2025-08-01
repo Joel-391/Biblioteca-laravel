@@ -50,6 +50,7 @@ class AdminController extends Controller
             'anio_publicacion'  => 'required|integer',
             'isbn'              => 'nullable|string|max:50',
             'categoria_id'      => 'required|integer|exists:categorias,id',
+            'portada'           => 'nullable|string|max:255', 
         ]);
         $libro = Libro::create($data);
         return response()->json($libro, 201);
@@ -163,6 +164,7 @@ public function updateUser(Request $request, $id)
             'anio_publicacion' => 'sometimes|integer',
             'isbn' => 'sometimes|string|max:50',
             'categoria_id' => 'sometimes|integer|exists:categorias,id',
+            'portada'          => 'nullable|string|max:255', 
             // demás campos...
         ]);
         $libro->update($data);
