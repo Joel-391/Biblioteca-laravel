@@ -9,6 +9,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EjemplarController;
 use App\Http\Controllers\AlquilerController;
 
+
+Route::middleware('auth:sanctum')->delete('/alquileres/{id}', [AlquilerController::class, 'destroy']);
+
 Route::get('/libros/{libro}/ejemplares-disponibles', [EjemplarController::class, 'disponibles']);
 Route::middleware('auth:sanctum')->get('/alquileres', [AlquilerController::class, 'index']);
 
