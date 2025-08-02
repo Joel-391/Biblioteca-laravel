@@ -96,3 +96,4 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 Route::get('/sanctum/csrf-cookie', function () {
     return response()->json(['csrf' => true]);
 });
+Route::get('/libros', [AdminController::class, 'getLibros']);

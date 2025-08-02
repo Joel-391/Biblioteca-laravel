@@ -27,3 +27,5 @@ Route::middleware('auth:sanctum')->get('/user', function (\Illuminate\Http\Reque
 });
 
 Route::middleware('auth:sanctum')->get('/sanciones', [AdminController::class, 'misSanciones']);
+Route::get('/categorias', [AdminController::class, 'getCategorias']);
+

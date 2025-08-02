@@ -17,7 +17,7 @@ class AdminController extends Controller
 {
     // -- Obtener todos --
     public function getUsers()       { return User::all(); }
-    public function getLibros()      { return Libro::all(); }
+    public function getLibros()      { return Libro::orderBy('created_at', 'desc')->get(); }
     public function getCategorias()  { return Categoria::all(); }
     public function getAlquileres()  { return Alquiler::all(); }
     public function getComentarios() { return Comentario::all(); }
